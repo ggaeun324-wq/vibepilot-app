@@ -1,134 +1,156 @@
-# 🐥 VibePilot — 바이브 코딩 매니저
+<div align="center">
 
-> 바이브 코딩의 기획부터 배포까지, AI와 함께 체계적으로 관리하는 개인 생산성 웹앱
+# 🐥 VibePilot
 
-## 📌 프로젝트 소개
+### 바이브 코딩, 기획부터 배포까지 — AI와 함께 체계적으로
 
-VibePilot은 **바이브 코딩(Vibe Coding)** 을 하는 개발자들이 프로젝트를 기획부터 배포까지 체계적으로 관리할 수 있도록 돕는 앱입니다.
+**VibePilot**은 "바이브 코딩(Vibe Coding)"으로 앱을 만드는 개발자가
+**기획 → 설계 → 개발 → 배포**까지의 여정에서 *지금 어디쯤 와 있고, 무엇을 다음에 해야 하는지*를
+한눈에 관리할 수 있게 돕는 **개인 생산성 앱**입니다.
 
-사용자의 경험 수준에 따라 맞춤형 여정을 제공하고, 진행 상황을 시각적으로 추적할 수 있습니다.
+웹으로도 실행되고, **Windows 데스크톱 앱(.exe)** 으로도 설치해 바로 쓸 수 있습니다.
+
+![VibePilot 홈 화면](docs/screenshots/01-home.png)
+
+</div>
+
+---
+
+## ✨ 한눈에 보기
+
+| | |
+|---|---|
+| 🎯 **무엇을** | 바이브 코딩 프로젝트의 전체 여정을 단계별로 관리 |
+| 👤 **누구를 위해** | 혼자 기획·개발·배포까지 하는 1인 개발자 / 바이브 코더 |
+| 🤖 **AI 역할** | `@github/copilot-sdk` 기반 AI 코치가 다음 행동·준비도·레포 상태를 안내 |
+| 💻 **실행 방식** | 반응형 웹 + Electron 데스크톱 앱(오프라인 SQLite 내장) |
+
+---
+
+## 📸 스크린샷으로 보는 VibePilot
+
+### 1. 레벨을 고르면 바로 시작 — 문서를 읽을 필요가 없습니다
+경험 수준(초보자 / 중급자 / 고급자)에 따라 여정의 세분화 정도가 달라집니다.
+
+![레벨 선택](docs/screenshots/01-home.png)
+
+### 2. 프로젝트 정보 입력 — 목표와 기간 설정
+프로젝트 이름, 목표, 시작일·마감일을 입력하면 D-day가 자동으로 계산됩니다.
+
+![프로젝트 설정](docs/screenshots/02-setup.png)
+
+### 3. AI 코치가 함께하는 대시보드
+현재 단계에 맞는 **AI 코치(Copilot SDK)**, **오늘의 추천 태스크**, **진행도 분석**을 한 화면에서 확인합니다.
+AI 제안은 자동 확정이 아니라 *추천*으로 제시되며, 사용자가 적용·무시·재생성할 수 있습니다.
+
+![AI 코치 대시보드](docs/screenshots/03-dashboard.png)
+
+### 4. 단계별 체크리스트
+기획부터 배포까지 각 단계를 스텝 단위로 체크하며 진행합니다.
+각 스텝의 `?` 버튼을 누르면 구체적인 가이드를 볼 수 있습니다.
+
+![단계별 체크리스트](docs/screenshots/04-checklist.png)
+
+---
 
 ## 🎯 핵심 기능
 
-### 1. 레벨별 맞춤 여정
+### 레벨별 맞춤 여정
 | 레벨 | 단계 수 | 대상 |
 |------|---------|------|
-| 🌱 초보자 | 5단계 (18스텝) | 코딩 경험 없음, AI에 전적 의존 |
+| 🌱 초보자 | 5단계 | 코딩이 처음, AI에 많이 의존 |
 | 🌿 중급자 | 7단계 | 코드를 읽고 수정할 수 있음 |
-| 🌳 고급자 | 10단계 (45스텝) | 아키텍처부터 배포까지 직접 가능 |
+| 🌳 고급자 | 10단계 | 아키텍처부터 운영까지 직접 |
 
-### 2. 프로젝트 설정
-- 프로젝트 이름 입력
-- 🎯 목표 설정
-- 📅 시작일 / 🏁 마감일 기간 설정
-- D-day 카운터 자동 계산
+### AI 코치 (Copilot SDK 핵심 활용)
+- **다음 행동 추천 / 준비도 점검 / 이슈·PR 확인** 등 프로젝트 흐름에 밀착된 안내
+- `@github/copilot-sdk`의 **에이전트 + 도구 호출(`defineTool`)** 로 프로젝트 컨텍스트를 읽어 응답
+- **스트리밍** 응답으로 생성 과정을 그대로 보여주고, 어떤 도구를 사용했는지 **투명하게 표시**
+- 3단계 폴백: **Copilot SDK → Azure OpenAI → 오프라인 정적 안내** (AI 미가용 상황에서도 앱은 유용)
 
-### 3. 진행도 대시보드
-- **프로그레스 링**: 전체 완료 퍼센테이지 시각화
-- **탭 UI**: 개요&추천 / 단계별 체크리스트 분리
-- **다음 할 일 안내**: 자동으로 다음 미완료 작업 표시
-- **진행도 분석**: 시간 경과 vs 실제 진행 비교
+### GitHub 레포 코드 분석
+- 사용자가 입력한 GitHub PAT(읽기 전용)로 접근 가능한 레포 목록 조회
+- 선택한 레포의 파일 트리·대표 파일을 읽어 구조/진행 단계/개선점 분석
+- Copilot SDK ↔ GitHub **MCP** 도구 연동으로 레포 컨텍스트 기반 질의응답
 
-### 4. GitHub 레포 코드 분석
-- **PAT 기반 레포 목록 조회**: 사용자가 입력한 GitHub 토큰으로 접근 가능한 레포 목록을 읽기 전용으로 불러오기
-- **Private 레포 분석**: 선택한 레포의 파일 트리와 대표 파일을 읽어 구조/진행 단계/개선 포인트 분석
-- **Copilot SDK + MCP 연동**: `@github/copilot-sdk` 에이전트가 내부 GitHub MCP 도구를 통해 레포 컨텍스트를 읽고 질문에 답변
+### 진행도 대시보드
+- 원형 프로그레스 링으로 전체 완료율 시각화
+- 시간 경과 vs 실제 진행 비교(앞서가는지/뒤처지는지)
+- 다음 미완료 작업 자동 안내, 오늘의 추천 태스크
 
-### 4. 마스코트 성장 시스템 🥚→🏆
-진행도에 따라 마스코트가 진화합니다:
+### 그 외
+- 🥚→🐣→🐥→🐔→🦅→🏆 마스코트 성장 시스템
+- 이메일/비밀번호 로그인 + HttpOnly 세션 쿠키
+- 단계별 일정의 Google Calendar 연동
 
-| 진행도 | 마스코트 | 이름 |
-|--------|----------|------|
-| 0% | 🥚 | 알 |
-| ~25% | 🐣 | 병아리 탄생! |
-| ~50% | 🐥 | 아기 병아리 |
-| ~75% | 🐔 | 성장한 닭 |
-| ~100% | 🦅 | 날개를 펼친 독수리 |
-| 100% | 🏆 | 전설의 개발자! |
+---
 
-### 5. AI 기능 (Copilot SDK)
-- **AI 채팅 어시스턴트**: 현재 단계에 맞는 바이브 코딩 가이드
-- **오늘의 추천 태스크**: 진행 상황 분석 기반 우선순위 추천
-- **GitHub 레포 분석**: URL 입력 → 프로젝트 상태/건강도 AI 분석
+## 💻 데스크톱 앱으로 설치하기 (Windows)
 
-### 6. 로그인 & 데이터 영속성
-- 이메일/비밀번호 로그인 및 회원가입
-- PostgreSQL 기반 계정/프로젝트 저장
-- HttpOnly 쿠키 기반 세션 유지
-- 기존 브라우저 localStorage 데이터 안전 이전
-- 재방문 시 세팅값 유지
+VibePilot은 클라우드 없이 **로컬에서 바로 실행**되는 데스크톱 앱으로 빌드됩니다.
+데이터는 사용자 PC의 **SQLite** 파일에 저장되어 오프라인에서도 동작합니다.
 
-### 7. 마이페이지
-- 프로젝트 리스트업 및 선택
-- 프로젝트 열기/삭제
-- Google Calendar 연동 토글 ON/OFF
-
-### 8. Google Calendar 연동
-- 단계별 기간 자동 배분 (스텝 수 비례)
-- 컬러 코딩 타임라인 바 시각화
-- 클릭으로 단계별/전체 일정을 Google Calendar에 추가
-
-### 9. 단계별 가이드 (❓ 툴팁)
-- 각 스텝 옆 ? 아이콘 마우스 오버 시 상세 가이드 표시
-- 현재 단계에서 구체적으로 무엇을 해야 하는지 안내
-
-## 🛠️ 기술 스택
-
-- **Frontend**: Next.js 16 + TypeScript
-- **스타일링**: Tailwind CSS
-- **AI 연동**: @github/copilot-sdk
-- **DB/ORM**: PostgreSQL + Prisma
-- **배포**: Azure Container Apps (단일 Next.js 서버)
-- **AI 모델**: Azure OpenAI (fallback 내장)
-- **인증**: 서버 API + HttpOnly 세션 쿠키
-- **데이터 저장**: PostgreSQL (기존 localStorage 데이터 마이그레이션 지원)
-
-## 🚀 시작하기
-
-### 설치
+### 빌드된 설치 파일(.exe) 만들기
 ```bash
 npm install
+npm run dist
 ```
 
-### 개발 서버 실행
+- 결과물: `dist-app/VibePilot Setup <version>.exe` (NSIS 설치 마법사)
+- 설치 시 시작 메뉴·바탕화면 바로가기가 생성되고, 설치 경로를 직접 선택할 수 있습니다.
+- 최초 실행 시 시드 DB가 사용자 데이터 폴더(`%APPDATA%/VibePilot`)로 복사됩니다.
+
+### 데스크톱 개발 모드
 ```bash
+npm run dev          # 1) Next.js 개발 서버
+npm run electron:dev # 2) Electron 창 띄우기
+```
+
+---
+
+## 🌐 웹으로 실행하기
+
+```bash
+npm install
 npm run dev
 ```
+브라우저에서 http://localhost:3000 접속.
 
-http://localhost:3000 에서 확인할 수 있습니다.
-
-### 필요한 환경 변수
-
-Copilot SDK의 Azure OpenAI BYOM 경로를 사용합니다.
-
+### 환경 변수 (AI 기능 사용 시)
 ```bash
 AZURE_OPENAI_ENDPOINT=https://<your-resource>.openai.azure.com
 MODEL_NAME=<azure-openai-deployment-name>
-NODE_ENV=development
 ```
+- 로컬에서는 `az login` 상태여야 Azure OpenAI BYOM 경로가 동작합니다.
+- 환경 변수가 없어도 앱의 핵심 흐름(여정·체크리스트·진행도)은 그대로 사용 가능합니다.
 
-- 로컬 개발에서는 `az login` 상태여야 합니다.
-- Azure Container Apps 배포에서는 Managed Identity를 사용하고, 필요하면 `AZURE_CLIENT_ID`를 함께 설정하세요.
+> ⚠️ **보안**: 모델 인증 정보·시크릿은 서버 사이드에만 두며, 프롬프트에 시크릿을 입력하도록 유도하지 않습니다.
+> GitHub PAT는 브라우저 메모리에서만 사용하고 저장하지 않습니다.
 
-### GitHub PAT 권한
+---
 
-- **Fine-grained PAT 권장**
-- 최소 권한:
-  - **Metadata: Read**
-  - **Contents: Read**
-- 토큰은 브라우저 메모리에서만 사용하며 저장하지 않습니다.
+## 🛠️ 기술 스택
 
-### 빌드
+| 영역 | 사용 기술 |
+|------|-----------|
+| Frontend | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS |
+| AI | `@github/copilot-sdk` (에이전트·도구 호출·스트리밍) · Azure OpenAI · GitHub MCP |
+| 데이터 | Prisma ORM · SQLite(데스크톱) |
+| 데스크톱 | Electron · electron-builder (NSIS) |
+| 인증 | bcrypt 해시 · HttpOnly 세션 쿠키 |
+| 테스트 | Vitest / node 테스트 |
+
+---
+
+## 🧪 테스트
+
 ```bash
-npm run build
+npm test
 ```
 
-### Azure 배포
-```bash
-azd up
-```
+핵심 로직(인증, 저장소, 검증, 레포 분석, 프로젝트 병합 등)에 대한 단위 테스트가 포함되어 있습니다.
 
-기본 배포는 `azure.yaml` 기준으로 `web` 단일 서비스(Next.js + API Routes)로 Container Apps에 올라갑니다.
+---
 
 ## 📁 프로젝트 구조
 
@@ -136,65 +158,34 @@ azd up
 src/
 ├── app/
 │   ├── api/
-│   │   ├── chat/route.ts       # AI 채팅 API (Azure OpenAI + fallback)
-│   │   ├── recommend/route.ts  # 오늘의 추천 태스크 API
-│   │   └── analyze/route.ts    # GitHub 레포 분석 API
-│   ├── globals.css             # 글로벌 스타일 + 애니메이션
-│   ├── layout.tsx              # 루트 레이아웃
-│   └── page.tsx                # 메인 페이지 (홈 + 대시보드 + 마이페이지)
-├── components/
-│   ├── Header.tsx              # 상단 헤더 + 로그인/마이페이지 버튼
-│   ├── LoginModal.tsx          # 로그인/회원가입 모달
-│   ├── MyPage.tsx              # 마이페이지 (프로젝트 리스트 + 캘린더)
-│   ├── LevelSelector.tsx       # 레벨 선택 카드 UI
-│   ├── Mascot.tsx              # 마스코트 진화 시스템
-│   ├── PhaseTimeline.tsx       # 단계별 체크리스트 + 툴팁
-│   ├── ProgressRing.tsx        # 원형 프로그레스 바
-│   ├── ProgressInsight.tsx     # 시간 vs 진행도 분석 패널
-│   ├── AIChat.tsx              # 레포 컨텍스트 질문 지원 AI 채팅
-│   ├── TodayRecommend.tsx      # 오늘의 추천 태스크
-│   ├── RepoAnalyzer.tsx        # GitHub PAT 기반 레포 선택 + 코드 분석
-│   └── GoogleCalendar.tsx      # Google Calendar 연동
-├── lib/
-│   ├── auth.ts                 # 인증 API 클라이언트 + legacy 이전
-│   ├── storage.ts              # 프로젝트 저장 API + 진행도 계산 로직
-│   ├── copilot.ts              # Copilot SDK + Azure OpenAI BYOM 실행
-│   ├── github-mcp.ts           # GitHub 읽기 전용 MCP 도구 정의
-│   ├── github.ts               # GitHub API 유틸 + 레포 컨텍스트 수집
-│   ├── prisma.ts               # Prisma 클라이언트
-│   ├── project-merge.ts        # legacy 프로젝트 안전 병합 로직
-│   └── repo-analysis.ts        # 레포 분석/헬스 점수 계산
-prisma/
-│   ├── schema.prisma           # DB 스키마
-│   └── migrations/             # 초기 마이그레이션
-└── types/
-    └── project.ts              # 타입 정의 + 전체 단계 데이터 (45스텝)
+│   │   ├── chat/            # AI 코치 (Copilot SDK → Azure OpenAI → 오프라인 폴백)
+│   │   ├── recommend/       # 오늘의 추천 태스크
+│   │   ├── analyze/         # GitHub 레포 분석
+│   │   ├── auth/            # 로그인 / 회원가입 / 세션
+│   │   ├── projects/        # 프로젝트 CRUD
+│   │   └── mcp/github/      # GitHub MCP 연동
+│   └── page.tsx             # 홈 + 대시보드 + 마이페이지 (SPA)
+├── components/              # UI 컴포넌트 (AICoachPanel, PhaseTimeline 등)
+└── lib/
+    └── copilot/             # Copilot SDK 세션·도구·컨텍스트 구성
+electron/main.js             # 데스크톱: 번들된 Next 서버 구동 + 창 로드
+scripts/prepare-standalone.mjs  # 빌드 산출물 + 시드 DB 패키징
+prisma/schema.prisma         # SQLite 스키마
 ```
-
-## 📊 진행도 로직
-
-- **시작 전**: 모든 단계 0%, "예정" 상태
-- **첫 클릭 후**: 시간 기반 목표치 계산 시작
-- **상태 표시**: 완료 ✅ / 진행 중 🔄 / 지연 ⚠️ / 예정 ⏳
-- **단계별 기간**: 총 기간을 스텝 수 비례로 자동 배분
-
-## 📝 바이브 코딩 전체 단계 (10단계)
-
-1. **🎯 기획** — 아이디어, 문제 정의, 타겟, 기능 목록, 우선순위, 일정
-2. **🎨 설계** — 사용자 플로우, 화면 목록, 와이어프레임, UI, DB, API, 기술 스택
-3. **⚙️ 환경 구축** — 프로젝트 초기화, Git, 개발 환경, 의존성, 환경변수, 폴더 구조
-4. **🖥️ 프론트엔드** — 레이아웃, 라우팅, 컴포넌트, 화면 구현, 상태 관리, 반응형
-5. **🔧 백엔드** — DB, API, 인증, 비즈니스 로직, 외부 API, 에러 처리
-6. **🔗 통합** — 프론트-백 연결, 데이터 바인딩, 플로우 테스트, 버그 수정
-7. **🧪 테스트** — 단위, 통합, E2E, 성능, 보안 테스트
-8. **📦 배포 준비** — 빌드 최적화, 환경 분리, CI/CD, 도메인, 모니터링
-9. **🚀 배포** — 스테이징, 최종 검증, 프로덕션, 배포 후 확인
-10. **📈 운영** — 피드백 수집, 버그 대응, 기능 업데이트, 성능 개선
-
-## 📜 라이선스
-
-MIT License
 
 ---
 
-🐥 *VibePilot — 바이브 코딩을 더 스마트하게*
+## 🤝 책임 있는 AI 원칙
+
+- AI 제안은 **자동 실행이 아니라 추천**으로 제시됩니다.
+- 사용자가 확인한 진행 상황과 AI가 생성한 안내를 UI에서 **구분**합니다.
+- 컨텍스트가 부족하면 AI가 **가정을 드러냅니다**.
+- 배포 안내는 준비를 돕는 역할이며, **실제 실행·제출 결정은 사용자**가 합니다.
+
+---
+
+<div align="center">
+
+VibePilot © 2026 — 바이브 코딩을 더 스마트하게 🐥
+
+</div>

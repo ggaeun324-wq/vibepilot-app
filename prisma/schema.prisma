@@ -3,14 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum ProjectLevel {
-  beginner
-  intermediate
-  advanced
 }
 
 model User {
@@ -42,7 +36,7 @@ model Project {
   clientId  String
   userId    String
   name      String
-  level     ProjectLevel
+  level     String
   goal      String
   startDate String
   endDate   String
