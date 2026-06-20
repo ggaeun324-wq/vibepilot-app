@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+npm-debug.log*
+python-port
+README.md
+HACKATHON_GUIDE.md
+EVALUATION.md
+AGENTS.md
+CLAUDE.md
+PRD.md
+*.md
