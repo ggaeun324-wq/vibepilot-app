@@ -56,14 +56,11 @@
     ],
     "extraResources": [
       {
-        "from": ".next/standalone",
-        "to": "app/.next/standalone"
-      },
-      {
         "from": "prisma/vibepilot.db",
         "to": "seed/vibepilot.db"
       }
     ],
+    "afterPack": "scripts/after-pack.cjs",
     "win": {
       "target": [
         "nsis"

@@ -45,3 +45,6 @@ next-env.d.ts
 /dist-app
 /.edge-profile
 *-out.txt
+
+# local run/test logs
+*.log
