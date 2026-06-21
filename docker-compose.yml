@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16          # Postgres 16 버전 이미지(레시피)
+    container_name: vibepilot-db
+    restart: unless-stopped
+    environment:                # DB 초기 계정/이름 설정
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: vibepilot
+    ports:
+      - "5432:5432"             # 내 PC의 5432 포트 → 컨테이너의 5432로 연결
+    volumes:
+      - vibepilot_pgdata:/var/lib/postgresql/data   # 데이터를 영구 저장(컨테이너 꺼져도 유지)
+
+volumes:
+  vibepilot_pgdata:
