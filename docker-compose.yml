@@ -1,16 +1,29 @@
+# 로컬 개발용: 앱(web) + 데이터베이스(db)를 함께 띄움
 services:
   db:
-    image: postgres:16          # Postgres 16 버전 이미지(레시피)
+    image: postgres:16
     container_name: vibepilot-db
     restart: unless-stopped
-    environment:                # DB 초기 계정/이름 설정
+    environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: vibepilot
     ports:
-      - "5432:5432"             # 내 PC의 5432 포트 → 컨테이너의 5432로 연결
+      - "5432:5432"
     volumes:
-      - vibepilot_pgdata:/var/lib/postgresql/data   # 데이터를 영구 저장(컨테이너 꺼져도 유지)
+      - vibepilot_pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .                      # 현재 폴더의 Dockerfile로 앱 이미지를 빌드
+    container_name: vibepilot-web
+    restart: unless-stopped
+    depends_on:
+      - db                        # db가 먼저 뜬 뒤 web이 뜨도록
+    environment:
+      # 컨테이너 안에서는 DB를 'db'(서비스 이름)로 부름 (localhost 아님!)
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/vibepilot?schema=public
+    ports:
+      - "3000:3000"
 
 volumes:
   vibepilot_pgdata:
