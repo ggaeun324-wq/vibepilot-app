@@ -1,0 +1,45 @@
+name: CI
+
+# 언제 이 로봇을 돌릴지: main으로 가는 PR, 그리고 main에 push될 때
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Lint, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 저장소 코드를 가져온다
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2) Node.js 22 설치 (npm 캐시로 속도 향상)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3) 의존성 설치 (package-lock 기준으로 정확히)
+      - name: Install dependencies
+        run: npm ci
+
+      # 4) Prisma Client 생성 (빌드에 필요)
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      # 5) 코드 검사
+      - name: Lint
+        run: npm run lint
+
+      # 6) 테스트
+      - name: Test
+        run: npm test
+
+      # 7) 빌드 확인
+      - name: Build
+        run: npm run build
