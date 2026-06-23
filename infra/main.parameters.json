@@ -6,7 +6,7 @@
       "value": "koreacentral"
     },
     "existingManagedEnvironmentResourceId": {
-      "value": "/subscriptions/37566b85-27d9-46c9-a699-67677396bbeb/resourceGroups/rg-prod/providers/Microsoft.App/managedEnvironments/vpqkgr7czm-env"
+      "value": ""
     }
   }
 }
