@@ -20,7 +20,7 @@ env:
 
 jobs:
   deploy:
-    name: Build in ACR and deploy
+    name: Build and deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -35,15 +35,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # 빌드를 GitHub이 아니라 Azure 레지스트리(ACR) 안에서 수행한다.
-      # Docker 데몬이 필요 없고, 빌드 결과가 곧바로 ACR에 저장된다.
-      - name: Build image in ACR
+      # 무료 체험 구독에서는 ACR Tasks(az acr build, 서버측 빌드)가 막혀 있다.
+      # 그래서 GitHub 러너에 내장된 Docker로 직접 이미지를 빌드하고
+      # ACR에 로그인해서 push 한다. (우리 OIDC 신원에 AcrPush 권한이 있음)
+      - name: Build and push image to ACR
         run: |
-          az acr build \
-            --registry "$ACR_NAME" \
-            --image "$IMAGE_NAME:${{ github.sha }}" \
-            --image "$IMAGE_NAME:latest" \
+          az acr login --name "$ACR_NAME"
+          docker build \
+            -t "$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}" \
+            -t "$ACR_NAME.azurecr.io/$IMAGE_NAME:latest" \
             .
+          docker push "$ACR_NAME.azurecr.io/$IMAGE_NAME:${{ github.sha }}"
+          docker push "$ACR_NAME.azurecr.io/$IMAGE_NAME:latest"
 
       # 새로 빌드한 이미지로 Container App을 업데이트(새 리비전 생성)한다.
       # 기존 환경변수/secret(DATABASE_URL 등)은 그대로 유지된다.
