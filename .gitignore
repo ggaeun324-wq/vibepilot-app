@@ -48,3 +48,6 @@ next-env.d.ts
 
 # local run/test logs
 *.log
+
+# Bicep 컴파일 산출물(생성물)
+infra/main.json
