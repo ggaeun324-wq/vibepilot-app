@@ -29,6 +29,9 @@ var acrName = toLower(replace('${prefix}acr', '-', ''))
 var identityName = '${prefix}-uami'
 var postgresName = '${prefix}-pg'
 var keyVaultName = '${prefix}kv'
+var openAiName = '${prefix}-openai'
+var embeddingDeploymentName = 'text-embedding-3-large'
+var embeddingDimensions = 1536
 var useExistingManagedEnvironment = !empty(existingManagedEnvironmentResourceId)
 var managedEnvironmentId = useExistingManagedEnvironment ? existingManagedEnvironmentResourceId : containerAppEnvironment.id
 
@@ -153,6 +156,17 @@ resource allowAzureServices 'Microsoft.DBforPostgreSQL/flexibleServers/firewallR
   }
 }
 
+// pgvector 확장 허용. Flexible Server는 보안상 확장을 기본 차단하므로
+// azure.extensions 에 VECTOR 를 등록해야 마이그레이션에서 CREATE EXTENSION vector 가 가능.
+resource postgresVectorConfig 'Microsoft.DBforPostgreSQL/flexibleServers/configurations@2024-08-01' = {
+  parent: postgres
+  name: 'azure.extensions'
+  properties: {
+    value: 'VECTOR'
+    source: 'user-override'
+  }
+}
+
 // ── Key Vault (비밀번호 금고) ──────────────────────────────────────────
 // DB 접속 문자열을 평문 env 대신 금고에 보관한다. RBAC로 접근을 통제.
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
@@ -215,6 +229,57 @@ resource databaseUrlSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   ]
 }
 
+// ── Azure OpenAI (임베딩 생성기) ───────────────────────────────────────
+// RAG용 임베딩(text-embedding-3-small)을 만든다. API 키를 끄고(disableLocalAuth)
+// 오직 Entra ID(관리 ID) 토큰으로만 호출 → 코드/금고 어디에도 키가 없다.
+resource openAi 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+  name: openAiName
+  location: location
+  tags: {
+    'azd-service-name': 'openai'
+  }
+  kind: 'OpenAI'
+  sku: {
+    name: 'S0'
+  }
+  properties: {
+    customSubDomainName: openAiName
+    publicNetworkAccess: 'Enabled'
+    disableLocalAuth: true
+  }
+}
+
+// 임베딩 모델 배포. Standard(리전) = 무료체험 구독에 쿼터가 있는 등급.
+// 3-large 는 기본 3072차원이나, 호출 시 dimensions=1536 로 줄여 pgvector 인덱스 한계 내로 맞춘다.
+resource embeddingDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: openAi
+  name: embeddingDeploymentName
+  sku: {
+    name: 'Standard'
+    capacity: 10
+  }
+  properties: {
+    model: {
+      format: 'OpenAI'
+      name: 'text-embedding-3-large'
+      version: '1'
+    }
+  }
+}
+
+// 앱 신원(UAMI)에게 "Cognitive Services OpenAI User" 권한 → 임베딩 호출 가능
+var openAiUserRoleId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')
+
+resource openAiUserAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(openAi.id, userAssignedIdentity.id, openAiUserRoleId)
+  scope: openAi
+  properties: {
+    principalId: userAssignedIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: openAiUserRoleId
+  }
+}
+
 resource webApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: appName
   location: location
@@ -266,6 +331,24 @@ resource webApp 'Microsoft.App/containerApps@2024-03-01' = {
               name: 'DATABASE_URL'
               secretRef: 'database-url'
             }
+            // RAG: 임베딩 호출용. 키가 아니라 관리 ID 토큰으로 인증한다.
+            {
+              name: 'AZURE_OPENAI_ENDPOINT'
+              value: openAi.properties.endpoint
+            }
+            {
+              name: 'AZURE_OPENAI_EMBEDDING_DEPLOYMENT'
+              value: embeddingDeploymentName
+            }
+            {
+              name: 'AZURE_OPENAI_EMBEDDING_DIMENSIONS'
+              value: string(embeddingDimensions)
+            }
+            // ManagedIdentityCredential 가 여러 신원 중 우리 UAMI 를 고르도록 clientId 지정
+            {
+              name: 'AZURE_CLIENT_ID'
+              value: userAssignedIdentity.properties.clientId
+            }
           ]
           resources: {
             cpu: '0.5'
@@ -291,3 +374,6 @@ output webUrl string = 'https://${webApp.properties.configuration.ingress.fqdn}'
 output postgresHost string = postgres.properties.fullyQualifiedDomainName
 output postgresDatabase string = databaseName
 output keyVaultUri string = keyVault.properties.vaultUri
+output openAiEndpoint string = openAi.properties.endpoint
+output openAiEmbeddingDeployment string = embeddingDeploymentName
+output openAiEmbeddingDimensions int = embeddingDimensions
