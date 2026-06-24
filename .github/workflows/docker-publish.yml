@@ -38,7 +38,7 @@ jobs:
       # 이미지 이름/태그를 자동 생성 (latest + 커밋 SHA)
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
