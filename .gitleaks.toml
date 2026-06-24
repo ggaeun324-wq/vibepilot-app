@@ -1,0 +1,12 @@
+# Gitleaks 설정: 기본 규칙은 모두 유지하되, 시크릿이 아닌 항목만 근거를 두고 예외 처리한다.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "False positives: 공개 식별자/설정값 (실제 비밀 아님)"
+# sonar-project.properties 의 projectKey/organization 은 공개 식별자다.
+# 실제 인증 토큰(SONAR_TOKEN)은 GitHub Actions secret 으로만 보관하며 코드에 없다.
+# generic-api-key 규칙이 긴 영숫자 식별자를 키로 오탐하므로 이 파일만 예외 처리.
+paths = [
+  '''sonar-project\.properties''',
+]
