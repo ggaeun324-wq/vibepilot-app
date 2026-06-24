@@ -50,6 +50,7 @@ jobs:
           output: trivy-results.sarif
           severity: CRITICAL,HIGH
           ignore-unfixed: true # 아직 패치가 없는 취약점은 제외(노이즈 감소)
+          trivyignores: .trivyignore # 근거를 문서화한 예외 목록
 
       - name: Upload Trivy SARIF
         uses: github/codeql-action/upload-sarif@v3
@@ -65,4 +66,5 @@ jobs:
           format: table
           severity: CRITICAL,HIGH
           ignore-unfixed: true
+          trivyignores: .trivyignore # 근거를 문서화한 예외 목록
           exit-code: "1"

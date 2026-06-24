@@ -1,0 +1,10 @@
+# Trivy ignore list — 예외는 반드시 "근거"와 함께 기록한다.
+#
+# CVE-2026-33671 — picomatch ReDoS (HIGH)
+#   위치: next@16.2.9(현재 최신 안정판)가 내부 번들한 next/dist/compiled/picomatch.
+#   우리 package-lock.json의 picomatch는 이미 4.0.4(패치본)지만, Next가 vendoring한
+#   복사본은 우리가 버전을 제어할 수 없고, 이를 고친 상위 Next 릴리스도 아직 없음.
+#   영향 평가: picomatch는 "빌드 시점 파일 경로 글로브" 용도로, 신뢰할 수 없는
+#   런타임 입력을 정규식에 넣지 않음 → ReDoS 실질 도달 가능성 매우 낮음.
+#   조치: Next.js가 vendored picomatch를 >=4.0.4로 올리면 본 예외를 제거하고 재검증.
+CVE-2026-33671
