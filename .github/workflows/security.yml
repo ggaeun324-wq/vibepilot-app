@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # 전체 git 히스토리까지 검사하려면 필요
 
@@ -36,7 +36,7 @@ jobs:
       security-events: write # 결과를 Security 탭에 업로드
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 운영과 동일한 이미지를 빌드해서 스캔 대상으로 삼는다
       - name: Build image

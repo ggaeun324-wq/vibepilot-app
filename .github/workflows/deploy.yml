@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 비밀번호/키 없이 OIDC로 Azure 로그인 (secret엔 식별자만 저장됨)
       - name: Azure login (OIDC)

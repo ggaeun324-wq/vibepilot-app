@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # gha 빌드 캐시(cache-from/to)를 쓰려면 buildx 빌더가 필요하다
       - name: Set up Docker Buildx
