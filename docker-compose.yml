@@ -1,7 +1,7 @@
 # 로컬 개발용: 앱(web) + 데이터베이스(db)를 함께 띄움
 services:
   db:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: vibepilot-db
     restart: unless-stopped
     environment:

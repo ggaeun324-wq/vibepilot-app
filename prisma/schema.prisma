@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model User {
@@ -47,4 +49,20 @@ model Project {
 
   @@unique([userId, clientId])
   @@index([userId, updatedAt])
+}
+
+// RAG 지식베이스. 단계별 베스트 프랙티스 문서를 청크 단위로 저장하고,
+// 임베딩(벡터)으로 의미 유사도 검색을 한다. embedding 은 pgvector 타입이라
+// Prisma 가 직접 타입을 모르므로 Unsupported 로 선언하고 쿼리는 $queryRaw 로 한다.
+model KnowledgeChunk {
+  id        String                       @id @default(cuid())
+  source    String
+  title     String
+  phase     String?
+  content   String
+  embedding Unsupported("vector(1536)")?
+  createdAt DateTime                     @default(now())
+
+  @@index([phase])
+  @@map("knowledge_chunks")
 }
