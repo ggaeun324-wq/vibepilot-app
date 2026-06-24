@@ -1,0 +1,24 @@
+# Dependabot: 낡거나 취약한 의존성을 자동으로 감지해 업데이트 PR을 열어준다.
+# (npm 패키지 + GitHub Actions 버전 둘 다 관리)
+version: 2
+updates:
+  # 1) 앱의 npm 의존성
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "chore(deps)"
+
+  # 2) 워크플로가 쓰는 GitHub Actions 버전
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - ci
+    commit-message:
+      prefix: "chore(ci)"
