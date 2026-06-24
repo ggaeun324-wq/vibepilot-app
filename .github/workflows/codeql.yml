@@ -1,0 +1,41 @@
+# CodeQL: 코드 자체의 보안 취약점(SAST)을 정적 분석한다.
+# 결과는 GitHub 저장소의 Security 탭(Code scanning)에 쌓인다.
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 매주 월요일 새벽 — 새로 공개된 취약 패턴을 주기적으로 재검사
+    - cron: "30 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: CodeQL Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # SARIF 결과를 Security 탭에 올리는 권한
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # JS/TS 언어로 분석 엔진 초기화. security-and-quality 쿼리셋 사용.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      # 분석 수행 (JS/TS는 별도 빌드가 필요 없다)
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"

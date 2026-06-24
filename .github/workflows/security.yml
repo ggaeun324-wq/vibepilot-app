@@ -1,0 +1,70 @@
+# Security: 배포 전에 "비밀 누출"과 "이미지 취약점"을 자동 검사한다.
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1) Gitleaks: 커밋/히스토리에 비밀번호·API키가 섞였는지 스캔 ──
+  gitleaks:
+    name: Secret scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 전체 git 히스토리까지 검사하려면 필요
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── 2) Trivy: 최종 도커 이미지 속 알려진 CVE 취약점 스캔 ──
+  trivy:
+    name: Image scan (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # 결과를 Security 탭에 업로드
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 운영과 동일한 이미지를 빌드해서 스캔 대상으로 삼는다
+      - name: Build image
+        run: docker build -t vibepilot-app:scan .
+
+      # SARIF 형식으로 스캔 → Security 탭에 기록 (보고용, 실패시키지 않음)
+      - name: Trivy scan (report to Security tab)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: vibepilot-app:scan
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true # 아직 패치가 없는 취약점은 제외(노이즈 감소)
+          trivyignores: .trivyignore # 근거를 문서화한 예외 목록
+
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+      # 게이트: 패치 가능한 CRITICAL/HIGH가 있으면 빌드를 실패시킨다
+      - name: Trivy gate (fail on fixable CRITICAL/HIGH)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: vibepilot-app:scan
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          trivyignores: .trivyignore # 근거를 문서화한 예외 목록
+          exit-code: "1"
