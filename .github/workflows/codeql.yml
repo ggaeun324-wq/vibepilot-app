@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # JS/TS 언어로 분석 엔진 초기화. security-and-quality 쿼리셋 사용.
       - name: Initialize CodeQL

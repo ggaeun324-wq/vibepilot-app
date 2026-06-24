@@ -15,7 +15,7 @@ jobs:
     steps:
       # 1) 저장소 코드를 가져온다
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # 2) Node.js 22 설치 (npm 캐시로 속도 향상)
       - name: Setup Node.js
