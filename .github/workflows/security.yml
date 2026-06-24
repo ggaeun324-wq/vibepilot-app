@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0 # 전체 git 히스토리까지 검사하려면 필요
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@v2.3.9
+        uses: gitleaks/gitleaks-action@v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_CONFIG: .gitleaks.toml # 오탐 예외를 문서화한 설정
