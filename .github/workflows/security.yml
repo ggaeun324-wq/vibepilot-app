@@ -25,6 +25,7 @@ jobs:
         uses: gitleaks/gitleaks-action@v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml # 오탐 예외를 문서화한 설정
 
   # ── 2) Trivy: 최종 도커 이미지 속 알려진 CVE 취약점 스캔 ──
   trivy:
