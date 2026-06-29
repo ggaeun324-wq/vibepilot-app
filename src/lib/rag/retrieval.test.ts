@@ -1,6 +1,32 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/prisma", () => ({ prisma: { $queryRawUnsafe: vi.fn() } }));
+vi.mock("./embeddings", async () => ({
+  toVectorLiteral: (v: number[]) => `[${v.join(",")}]`,
+  isEmbeddingEnabled: () => true,
+  embedText: vi.fn().mockResolvedValue([0.1, 0.2]),
+}));
+
+import { prisma } from "@/lib/prisma";
 import { toVectorLiteral } from "./embeddings";
-import { buildEvidenceBlock, type KnowledgeHit } from "./retrieval";
+import { buildEvidenceBlock, searchKnowledge, type KnowledgeHit } from "./retrieval";
+
+describe("searchKnowledge", () => {
+  it("returns empty for blank query", async () => {
+    expect(await searchKnowledge("   ")).toEqual([]);
+  });
+  it("maps rows with similarity", async () => {
+    (prisma.$queryRawUnsafe as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+      { title: "t", source: "s", phase: null, content: "c", distance: 0.2 },
+    ]);
+    const hits = await searchKnowledge("hello");
+    expect(hits[0].similarity).toBe(0.8);
+  });
+  it("returns empty on error", async () => {
+    (prisma.$queryRawUnsafe as ReturnType<typeof vi.fn>).mockRejectedValueOnce(new Error("boom"));
+    expect(await searchKnowledge("hello")).toEqual([]);
+  });
+});
 
 describe("toVectorLiteral", () => {
   it("formats a number array as pgvector literal", () => {
