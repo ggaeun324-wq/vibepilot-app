@@ -32,19 +32,20 @@ async function setVal(page, els, i, v) {
 }
 
 const browser = await puppeteer.connect({ browserURL: "http://127.0.0.1:9222", defaultViewport: { width: W, height: H } });
-const page = (await browser.pages())[0] ?? await browser.newPage();
+const page = await browser.newPage();
 await page.setViewport({ width: W, height: H });
-// 워밍업: 완전히 로드될 때까지 대기 → 첫 프레임부터 화면이 보임
+console.error("step:goto");
 await page.goto(BASE, { waitUntil: "domcontentloaded", timeout: 30000 });
-await sleep(10000);
-await page.reload({ waitUntil: "networkidle2", timeout: 30000 });
-await sleep(2500);
-setTimeout(() => { console.error("timeout"); process.exit(1); }, 60000);
+console.error("step:loaded");
+await sleep(6000);
+await sleep(4000);
+console.error("step:warm-done");
+setTimeout(() => { console.error("timeout"); process.exit(1); }, 90000);
 
 const frames = [];
 const grab = async (n = 1) => { for (let i = 0; i < n; i++) { try { frames.push(await page.screenshot({ type: "png" })); } catch { /* page navigating */ } await sleep(150); } };
 
-await grab(8);                                   // 홈 (메인 비주얼)
+await grab(8); console.error("step:home-frames="+frames.length);
 try {
   await click(page, "button,div", "중급자"); await sleep(900); await grab(4);
   const d = await page.$$('input[type="date"]');
