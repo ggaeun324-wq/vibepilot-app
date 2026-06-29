@@ -2,9 +2,8 @@
   "name": "vibepilot",
   "version": "0.1.0",
   "private": true,
-  "description": "VibePilot — 바이브 코딩 기획부터 배포까지 관리하는 개인 생산성 데스크톱 앱",
+  "description": "VibePilot — 바이브 코딩 기획부터 배포까지 관리하는 개인 생산성 웹 앱",
   "author": "ggaeun324-wq",
-  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,10 +12,7 @@
     "postinstall": "prisma generate",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
-    "electron:dev": "electron .",
-    "app:build": "next build && node scripts/prepare-standalone.mjs",
-    "dist": "npm run app:build && electron-builder --win nsis"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@azure/identity": "^4.13.1",
@@ -36,43 +32,11 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.1.9",
-    "electron": "^42.4.1",
-    "electron-builder": "^26.15.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "prisma": "^6.19.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.9"
-  },
-  "build": {
-    "appId": "com.vibepilot.desktop",
-    "productName": "VibePilot",
-    "directories": {
-      "output": "dist-app",
-      "buildResources": "build"
-    },
-    "files": [
-      "electron/**/*",
-      "package.json"
-    ],
-    "extraResources": [
-      {
-        "from": "prisma/vibepilot.db",
-        "to": "seed/vibepilot.db"
-      }
-    ],
-    "afterPack": "scripts/after-pack.cjs",
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "shortcutName": "VibePilot"
-    }
   }
 }
