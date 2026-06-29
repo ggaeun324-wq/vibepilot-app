@@ -198,7 +198,7 @@ export function buildProjectSnapshot(context: VibePilotChatContext): string {
   ].join("\n");
 }
 
-export function buildCopilotPrompt(context: VibePilotChatContext): string {
+export function buildCopilotPrompt(context: VibePilotChatContext, evidence?: string): string {
   return [
     "다음 VibePilot 프로젝트 상태를 기준으로 사용자의 질문에 답하세요.",
     "가능하면 recommend_next_action 도구를 사용해 다음 행동과 성공 기준을 구체화하세요.",
@@ -206,6 +206,7 @@ export function buildCopilotPrompt(context: VibePilotChatContext): string {
     "응답은 한국어로, 짧은 진단 -> 추천 행동 -> 성공 기준 순서로 작성하세요.",
     "",
     buildProjectSnapshot(context),
+    evidence ? `\n${evidence}` : "",
     "",
     `사용자 질문: ${context.message}`,
   ].join("\n");

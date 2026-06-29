@@ -6,6 +6,8 @@ import {
   type VibePilotChatContext,
 } from "@/lib/copilot/project-context";
 
+import { searchKnowledge, buildEvidenceBlock } from "@/lib/rag/retrieval";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -41,7 +43,9 @@ function createTextStream(context: VibePilotChatContext): ReadableStream<Uint8Ar
           if (!sawDelta) enqueue(finalContent);
         });
 
-        await session.sendAndWait({ prompt: buildCopilotPrompt(context) }, 120000);
+        const hits = await searchKnowledge(context.message);
+        const evidence = buildEvidenceBlock(hits);
+        await session.sendAndWait({ prompt: buildCopilotPrompt(context, evidence) }, 120000);
 
         if (!sawDelta && !finalContent) {
           enqueue(buildFallbackResponse(context));
