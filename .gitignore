@@ -41,11 +41,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# electron desktop build
-/dist-app
-/.edge-profile
-*-out.txt
-
 # local run/test logs
 *.log
 
