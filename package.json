@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@azure/identity": "^4.13.1",
-    "@github/copilot": "^1.0.64-1",
+    "@github/copilot": "^1.0.67",
     "@github/copilot-sdk": "^1.0.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/client": "^6.19.0",
